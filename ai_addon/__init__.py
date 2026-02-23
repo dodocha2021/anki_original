@@ -17,7 +17,8 @@ import traceback
 
 import aqt
 from aqt import gui_hooks
-from aqt.qt import QAction, QMenu
+from aqt.addons import ConfigEditor
+from aqt.qt import QAction, QMenu, QWidget
 from aqt.utils import showInfo, showWarning
 
 
@@ -64,7 +65,15 @@ def _open_deck_prompt_dialog() -> None:
 
 
 def _open_config() -> None:
-    aqt.mw.addonManager.showConfigEditor(aqt.mw.addonManager.addonFromModule(__name__))
+    addon_name = aqt.mw.addonManager.addonFromModule(__name__)
+    conf = aqt.mw.addonManager.getConfig(addon_name)
+    if conf is None:
+        showWarning("No configuration found for this add-on.", parent=aqt.mw)
+        return
+    # ConfigEditor expects a parent object with a .mgr attribute.
+    class _Parent(QWidget):
+        mgr = aqt.mw.addonManager
+    ConfigEditor(_Parent(aqt.mw), addon_name, conf)
 
 
 def _setup_tools_menu() -> None:
