@@ -10,7 +10,6 @@ import os
 from typing import Optional
 
 import aqt
-from anki.decks import DeckId
 
 
 _PROMPTS_FILENAME = "deck_prompts.json"
@@ -65,7 +64,9 @@ def delete_prompt(deck_name: str) -> None:
 
 
 def _default_prompt() -> str:
-    config = aqt.mw.addonManager.getConfig(__name__)
+    config = aqt.mw.addonManager.getConfig(
+        aqt.mw.addonManager.addonFromModule(__name__)
+    )
     if config and config.get("default_prompt"):
         return config["default_prompt"]
     return (

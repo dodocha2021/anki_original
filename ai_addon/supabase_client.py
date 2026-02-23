@@ -19,7 +19,9 @@ class SupabaseError(Exception):
 
 def _get_config() -> tuple[str, str, str]:
     """Return (url, anon_key, table_name) from add-on config."""
-    config = aqt.mw.addonManager.getConfig(__name__) or {}
+    config = aqt.mw.addonManager.getConfig(
+        aqt.mw.addonManager.addonFromModule(__name__)
+    ) or {}
     url = config.get("supabase_url", "").rstrip("/")
     key = config.get("supabase_anon_key", "")
     table = config.get("supabase_table", "ai_card_content")

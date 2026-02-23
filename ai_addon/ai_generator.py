@@ -28,7 +28,9 @@ def generate_html(front: str, prompt: str) -> str:
     Raises:
         AIGenerationError: If the API call fails.
     """
-    config = aqt.mw.addonManager.getConfig(__name__)
+    config = aqt.mw.addonManager.getConfig(
+        aqt.mw.addonManager.addonFromModule(__name__)
+    )
     provider = (config or {}).get("ai_provider", "openai")
 
     if provider == "anthropic":

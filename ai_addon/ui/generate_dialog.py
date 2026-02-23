@@ -80,7 +80,9 @@ class GenerateDialog(QDialog):
 
     def _run(self) -> None:
         self.run_btn.setEnabled(False)
-        config = aqt.mw.addonManager.getConfig(__name__) or {}
+        config = aqt.mw.addonManager.getConfig(
+            aqt.mw.addonManager.addonFromModule(__name__)
+        ) or {}
         delay_ms = config.get("request_delay_ms", 500)
 
         col = aqt.mw.col
