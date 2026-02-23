@@ -13,6 +13,8 @@ Menu items added:
   Browser: Edit → Generate AI Content (empty only)
 """
 
+import traceback
+
 import aqt
 from aqt import gui_hooks
 from aqt.qt import QAction, QMenu
@@ -23,7 +25,7 @@ def _on_browser_menu(browser) -> None:
     """Add AI generation actions to the Browser's Edit menu."""
     menu = browser.form.menuEdit
 
-    separator = menu.addSeparator()
+    menu.addSeparator()
 
     action_all = QAction("Generate AI Content for Selected", browser)
     action_all.triggered.connect(lambda: _generate_selected(browser, empty_only=False))
@@ -66,20 +68,28 @@ def _open_config() -> None:
 
 
 def _setup_tools_menu() -> None:
-    menu_bar = aqt.mw.form.menubar
-    ai_menu = QMenu("AI Card Generator", aqt.mw)
+    print("AI Card Generator: _setup_tools_menu called")
+    try:
+        # Add as a sub-menu under the existing Tools menu.
+        # This is more reliable on macOS than inserting a new top-level menu.
+        tools_menu = aqt.mw.form.menuTools
 
-    prompts_action = QAction("Configure Deck Prompts…", aqt.mw)
-    prompts_action.triggered.connect(_open_deck_prompt_dialog)
-    ai_menu.addAction(prompts_action)
+        tools_menu.addSeparator()
 
-    config_action = QAction("Configure API Keys…", aqt.mw)
-    config_action.triggered.connect(_open_config)
-    ai_menu.addAction(config_action)
+        ai_submenu = tools_menu.addMenu("AI Card Generator")
 
-    # Insert before the Help menu
-    help_menu = aqt.mw.form.menuHelp
-    menu_bar.insertMenu(help_menu.menuAction(), ai_menu)
+        prompts_action = QAction("Configure Deck Prompts…", aqt.mw)
+        prompts_action.triggered.connect(_open_deck_prompt_dialog)
+        ai_submenu.addAction(prompts_action)
+
+        config_action = QAction("Configure API Keys…", aqt.mw)
+        config_action.triggered.connect(_open_config)
+        ai_submenu.addAction(config_action)
+
+        print("AI Card Generator: menu installed under Tools")
+    except Exception:
+        print("AI Card Generator: ERROR in _setup_tools_menu:")
+        traceback.print_exc()
 
 
 # Register hooks once Anki's main window is ready
