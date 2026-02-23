@@ -13,7 +13,8 @@ Menu items added:
   Browser: Edit → Generate AI Content (empty only)
 """
 
-from aqt import gui_hooks, mw
+import aqt
+from aqt import gui_hooks
 from aqt.qt import QAction, QMenu
 from aqt.utils import showInfo, showWarning
 
@@ -43,7 +44,7 @@ def _generate_selected(browser, empty_only: bool = False) -> None:
         return
 
     if empty_only:
-        note_ids = notes_missing_ai_content(note_ids, mw.col)
+        note_ids = notes_missing_ai_content(note_ids, aqt.mw.col)
         if not note_ids:
             showInfo("All selected cards already have AI content.", parent=browser)
             return
@@ -56,28 +57,28 @@ def _generate_selected(browser, empty_only: bool = False) -> None:
 def _open_deck_prompt_dialog() -> None:
     from .ui.deck_prompt_dialog import DeckPromptDialog
 
-    dlg = DeckPromptDialog(parent=mw)
+    dlg = DeckPromptDialog(parent=aqt.mw)
     dlg.exec()
 
 
 def _open_config() -> None:
-    mw.addonManager.showConfigEditor(mw.addonManager.addonFromModule(__name__))
+    aqt.mw.addonManager.showConfigEditor(aqt.mw.addonManager.addonFromModule(__name__))
 
 
 def _setup_tools_menu() -> None:
-    menu_bar = mw.form.menubar
-    ai_menu = QMenu("AI Card Generator", mw)
+    menu_bar = aqt.mw.form.menubar
+    ai_menu = QMenu("AI Card Generator", aqt.mw)
 
-    prompts_action = QAction("Configure Deck Prompts…", mw)
+    prompts_action = QAction("Configure Deck Prompts…", aqt.mw)
     prompts_action.triggered.connect(_open_deck_prompt_dialog)
     ai_menu.addAction(prompts_action)
 
-    config_action = QAction("Configure API Keys…", mw)
+    config_action = QAction("Configure API Keys…", aqt.mw)
     config_action.triggered.connect(_open_config)
     ai_menu.addAction(config_action)
 
     # Insert before the Help menu
-    help_menu = mw.form.menuHelp
+    help_menu = aqt.mw.form.menuHelp
     menu_bar.insertMenu(help_menu.menuAction(), ai_menu)
 
 
