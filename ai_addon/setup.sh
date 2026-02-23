@@ -41,13 +41,28 @@ rm -f "$ADDON_DEST/setup.sh"
 echo "Add-on installed."
 
 # ── 3. Create launch script ────────────────────────────────────────────────────
-cat > "$LAUNCH_SCRIPT" << 'EOF'
+# NOTE: We use the direct binary path with --base instead of "open -a Anki"
+# because macOS's `open` command does NOT reliably pass environment variables
+# (like ANKI_BASE) to the launched application.
+cat > "$LAUNCH_SCRIPT" << 'LAUNCH_EOF'
 #!/usr/bin/env bash
 # Launch Anki with the custom (isolated) data directory.
 # Your regular Anki profile is NOT affected.
-export ANKI_BASE="$HOME/AnkiCustomData"
-open -a Anki
-EOF
+#
+# IMPORTANT: Close any currently open Anki window before running this,
+# because Anki only runs one instance at a time.
+
+ANKI_BIN="/Applications/Anki.app/Contents/MacOS/anki"
+
+if [ ! -f "$ANKI_BIN" ]; then
+  echo "ERROR: Anki not found at $ANKI_BIN"
+  echo "Is Anki installed in /Applications? If not, edit this script to fix the path."
+  exit 1
+fi
+
+echo "Launching Anki with custom data at: $HOME/AnkiCustomData"
+"$ANKI_BIN" --base "$HOME/AnkiCustomData" &
+LAUNCH_EOF
 chmod +x "$LAUNCH_SCRIPT"
 echo "Launch script created at: $LAUNCH_SCRIPT"
 
